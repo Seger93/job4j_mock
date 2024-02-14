@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Dmitry Stepanov
  * @version 24.09.2023 21:50
  */
-@Disabled
 @SpringBootTest(classes = SiteSrv.class)
 @AutoConfigureMockMvc
 class IndexControllerTest {
