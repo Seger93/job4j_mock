@@ -108,7 +108,8 @@
                                 </small>
                             </td>
                             <td>
-                                <span class="badge bg-success" th:text="${sizeCategory.get(category.getId())}"></span>
+                                <span class="badge bg-success" th:text="${sizeCategory.get(category.getId()) == null ? 'новых 0'
+                                : sizeCategory.get(category.getId())}"></span>
                             </td>
                         </tr>
                         </tbody>

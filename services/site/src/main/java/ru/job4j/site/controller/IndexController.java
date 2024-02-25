@@ -51,15 +51,12 @@ public class IndexController {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
-        Map<Integer, Integer> sizeCategoryInterview = interviewDTOList.stream()
-                .collect(Collectors.groupingBy(interview -> {
-                            try {
-                                return topicsService.getById(interview.getTopicId()).getCategory().getId();
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
-                        Collectors.reducing(0, e -> 1, Integer::sum)));
+        Map<Integer, Integer> sizeCategoryInterview = new HashMap<>();
+        for (InterviewDTO interview : interviewDTOList) {
+            int categoryId = topicsService.getById(interview.getTopicId()).getCategory().getId();
+            Integer count = sizeCategoryInterview.get(categoryId);
+            sizeCategoryInterview.put(categoryId, count == null ? 1 : ++count);
+        }
         model.addAttribute("sizeCategory", sizeCategoryInterview);
         model.addAttribute("new_interviews", interviewDTOList);
         model.addAttribute("users", userList);
