@@ -3,11 +3,9 @@ package ru.job4j.site.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.job4j.site.dto.InterviewDTO;
 import ru.job4j.site.dto.ProfileDTO;
 import ru.job4j.site.service.*;
@@ -28,6 +26,7 @@ public class IndexController {
     private final AuthService authService;
     private final NotificationService notifications;
     private final ProfilesService profilesService;
+    private final TopicsService topicsService;
 
     @GetMapping({"/", "index"})
     public String getIndexPage(Model model, HttpServletRequest req) throws JsonProcessingException {
@@ -52,6 +51,13 @@ public class IndexController {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
+        Map<Integer, Integer> sizeCategoryInterview = new HashMap<>();
+        for (InterviewDTO interview : interviewDTOList) {
+            int categoryId = topicsService.getById(interview.getTopicId()).getCategory().getId();
+            Integer count = sizeCategoryInterview.get(categoryId);
+            sizeCategoryInterview.put(categoryId, count == null ? 1 : ++count);
+        }
+        model.addAttribute("sizeCategory", sizeCategoryInterview);
         model.addAttribute("new_interviews", interviewDTOList);
         model.addAttribute("users", userList);
         return "index";
