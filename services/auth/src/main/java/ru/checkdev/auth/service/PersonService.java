@@ -25,6 +25,7 @@ import ru.checkdev.auth.domain.Notify;
 import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.domain.Photo;
 import ru.checkdev.auth.domain.Role;
+import ru.checkdev.auth.dto.PersonDTO;
 import ru.checkdev.auth.repository.PersonRepository;
 
 import javax.imageio.IIOImage;
@@ -309,5 +310,16 @@ public class PersonService {
         }
         emptyNames.addAll(Arrays.asList(extra));
         return emptyNames;
+    }
+
+    public Optional<PersonDTO> findByChatId(Long chatId) {
+        final Optional<PersonDTO> result;
+        PersonDTO personDTO = this.persons.findPersonDtoByChatId(chatId);
+        if (personDTO == null) {
+            result = Optional.empty();
+        } else {
+            result = Optional.of(personDTO);
+        }
+        return result;
     }
 }

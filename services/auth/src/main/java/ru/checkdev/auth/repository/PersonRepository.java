@@ -8,8 +8,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.domain.Photo;
+import ru.checkdev.auth.dto.PersonDTO;
 import ru.checkdev.auth.dto.ProfileDTO;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -17,6 +19,9 @@ import java.util.List;
  * @since 25.09.2016
  */
 public interface PersonRepository extends CrudRepository<Profile, Integer> {
+
+    @Query("SELECT new ru.checkdev.auth.dto.PersonDTO(p.email, p.username, p.password, p.privacy, p.created, p.chatId) FROM profile p WHERE p.chatId = :chatId")
+    PersonDTO findPersonDtoByChatId(@Param("chatId") Long chatId);
 
     Profile findByEmail(String email);
 
@@ -60,7 +65,7 @@ public interface PersonRepository extends CrudRepository<Profile, Integer> {
      * @param id int person id
      * @return ProfileDTO
      */
-    @Query("SELECT new ru.checkdev.auth.dto.ProfileDTO(p.id, p.username, p.experience, p.photo.id, p.updated, p.created) FROM profile p WHERE p.id = :id")
+    @Query("SELECT new ru.checkdev.auth.dto.ProfileDTO(p.id, p.username, p.experience, p.photo.id, p.updated, p.created, p.chatId) FROM profile p WHERE p.id = :id")
     ProfileDTO findProfileById(@Param("id") int id);
 
     /**
@@ -70,6 +75,6 @@ public interface PersonRepository extends CrudRepository<Profile, Integer> {
      *
      * @return List ProfileDTO
      */
-    @Query("SELECT new ru.checkdev.auth.dto.ProfileDTO(p.id, p.username, p.experience, p.photo.id, p.updated, p.created) FROM profile p ORDER BY p.created DESC")
+    @Query("SELECT new ru.checkdev.auth.dto.ProfileDTO(p.id, p.username, p.experience, p.photo.id, p.updated, p.created, p.chatId) FROM profile p ORDER BY p.created DESC")
     List<ProfileDTO> findProfileOrderByCreatedDesc();
 }

@@ -32,4 +32,6 @@ public class ProfileDTO {
      * Поле дата создания профиля.
      */
     private Calendar created;
+
+    private Long chatId;
 }

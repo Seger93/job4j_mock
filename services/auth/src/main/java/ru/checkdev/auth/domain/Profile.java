@@ -76,6 +76,8 @@ public class Profile {
 
     private Calendar created;
 
+    private Long chatId;
+
     public Profile() {
     }
 
@@ -123,6 +125,13 @@ public class Profile {
         this.photo = photo;
         this.privacy = privacy;
         this.location = location;
+    }
+
+    public Profile(int id, String email, String password, Long chatId) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.chatId = chatId;
     }
 
     public String getUsername() {
@@ -303,6 +312,14 @@ public class Profile {
 
     public void setBrief(String brief) {
         this.brief = brief;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

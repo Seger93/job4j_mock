@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.checkdev.auth.domain.Profile;
+import ru.checkdev.auth.dto.PersonDTO;
 import ru.checkdev.auth.service.PersonService;
 import ru.checkdev.auth.service.RoleService;
 
@@ -146,5 +147,15 @@ public class PersonController {
         map.put("personsShowed", persons.findByShow(true, PageRequest.of(pageToShow, limit)));
         map.put("getTotal", persons.showed());
         return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/telegram/{chatId}")
+    public ResponseEntity<PersonDTO> findPerson(@PathVariable Long chatId) {
+         var profile = persons.findByChatId(chatId);
+         PersonDTO personDTO = new PersonDTO();
+         personDTO.setEmail(profile.get().getEmail());
+         personDTO.setUsername(profile.get().getUsername());
+         personDTO.setCreated(profile.get().getCreated());
+        return new ResponseEntity<>(personDTO, HttpStatus.OK);
     }
 }

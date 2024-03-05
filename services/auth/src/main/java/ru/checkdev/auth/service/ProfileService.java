@@ -34,9 +34,9 @@ public class ProfileService {
     }
 
     /**
-     * Получить список всех PersonDTO
+     * Получить список всех ProfileDTO
      *
-     * @return List<PersonDTO>
+     * @return List<ProfileDTO>
      */
     public List<ProfileDTO> findProfilesOrderByCreatedDesc() {
         return personRepository.findProfileOrderByCreatedDesc();
