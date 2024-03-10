@@ -11,7 +11,7 @@ import ru.checkdev.auth.domain.Photo;
 import ru.checkdev.auth.dto.PersonDTO;
 import ru.checkdev.auth.dto.ProfileDTO;
 
-import java.util.Calendar;
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -20,6 +20,23 @@ import java.util.List;
  */
 public interface PersonRepository extends CrudRepository<Profile, Integer> {
 
+    /**
+     * Нативный запрос для обновления(восстановления) пароля
+     * @param chatId
+     * @param password
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE profile p SET p.password = :password WHERE p.chatId = :chatId")
+    int updatePasswordByTelegram(@Param("password") String password, @Param("chatId") Long chatId);
+
+    /**
+     * Нативный запрос для поиска по id чата в телеграмм.
+     * Возвращает PersonDTO
+     *
+     * @param chatId
+     * @return
+     */
     @Query("SELECT new ru.checkdev.auth.dto.PersonDTO(p.email, p.username, p.password, p.privacy, p.created, p.chatId) FROM profile p WHERE p.chatId = :chatId")
     PersonDTO findPersonDtoByChatId(@Param("chatId") Long chatId);
 

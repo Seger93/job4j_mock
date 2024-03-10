@@ -313,7 +313,7 @@ public class PersonService {
     }
 
     public Optional<PersonDTO> findByChatId(Long chatId) {
-        final Optional<PersonDTO> result;
+        Optional<PersonDTO> result;
         PersonDTO personDTO = this.persons.findPersonDtoByChatId(chatId);
         if (personDTO == null) {
             result = Optional.empty();
@@ -321,5 +321,17 @@ public class PersonService {
             result = Optional.of(personDTO);
         }
         return result;
+    }
+
+    public Optional<Map<String, String>> updatePassword(Long chatId) {
+        String password = RandomStringUtils.randomAlphabetic(8);
+        String newPassword = this.encoding.encode(password);
+        int result = this.persons.updatePasswordByTelegram(newPassword, chatId);
+        if (result > 0) {
+            Map<String, String> map = new HashMap<>();
+            map.put("password", password);
+            return Optional.of(map);
+        }
+        return Optional.empty();
     }
 }

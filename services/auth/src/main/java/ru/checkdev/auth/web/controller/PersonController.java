@@ -16,6 +16,7 @@ import ru.checkdev.auth.service.PersonService;
 import ru.checkdev.auth.service.RoleService;
 
 import javax.servlet.ServletException;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
@@ -148,14 +149,25 @@ public class PersonController {
         map.put("getTotal", persons.showed());
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+
     @GetMapping("/telegram/{chatId}")
-    public ResponseEntity<PersonDTO> findPerson(@PathVariable Long chatId) {
+    public ResponseEntity<Object> findPerson(@PathVariable Long chatId) {
          var profile = persons.findByChatId(chatId);
-         PersonDTO personDTO = new PersonDTO();
-         personDTO.setEmail(profile.get().getEmail());
-         personDTO.setUsername(profile.get().getUsername());
-         personDTO.setCreated(profile.get().getCreated());
-        return new ResponseEntity<>(personDTO, HttpStatus.OK);
+         if (profile.isPresent()) {
+             PersonDTO personDTO = new PersonDTO();
+             personDTO.setEmail(profile.get().getEmail());
+             personDTO.setPassword(profile.get().getPassword());
+             personDTO.setUsername(profile.get().getUsername());
+             personDTO.setCreated(profile.get().getCreated());
+             return new ResponseEntity<>(personDTO, HttpStatus.OK);
+         }
+        return new ResponseEntity<>("Person not found", HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping("/updatePasswordTg")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Long chatId) {
+        return persons.updatePassword(chatId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }

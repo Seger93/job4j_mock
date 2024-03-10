@@ -35,6 +35,7 @@ public class SecurityConfig {
                 "/order/save",
                 "/person/by/email",
                 "/person/telegram/{chatId}",
+                "/person/updatePasswordTg",
                 "/img",
                 "/person/profile",
                 "/template/queue",

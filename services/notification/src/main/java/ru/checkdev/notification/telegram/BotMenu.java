@@ -52,6 +52,9 @@ public class BotMenu extends TelegramLongPollingBot {
                 var msg = actions.get(bindingBy.get(chatId)).callback(update.getMessage());
                 bindingBy.remove(chatId);
                 send(msg);
+            } else {
+                var msg = actions.get("unknown").handle(update.getMessage());
+                send(msg);
             }
         }
     }
