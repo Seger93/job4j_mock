@@ -40,12 +40,14 @@ public class TgRun {
     @Bean
     public void initTg() {
         List<String> action = List.of(
-                "/start", "/new", "/check", "/forget");
+                "/start", "/new", "/check", "/forget", "/subscribe", "/unsubscribe");
         Map<String, Action> actionMap = Map.of(
                 "/start", new InfoAction(action),
                 "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth),
                 "/check", new CheckAction(tgAuthCallWebClint),
                 "/forget", new ForgetAction(tgAuthCallWebClint),
+                "/subscribe", new Subscribe(tgAuthCallWebClint),
+                "/unsubscribe", new Unsubscribe(tgAuthCallWebClint),
                 "unknown", new UnknownAction(action)
         );
         try {

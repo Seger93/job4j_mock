@@ -16,7 +16,6 @@ import ru.checkdev.auth.service.PersonService;
 import ru.checkdev.auth.service.RoleService;
 
 import javax.servlet.ServletException;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
@@ -152,15 +151,16 @@ public class PersonController {
 
     @GetMapping("/telegram/{chatId}")
     public ResponseEntity<Object> findPerson(@PathVariable Long chatId) {
-         var profile = persons.findByChatId(chatId);
-         if (profile.isPresent()) {
-             PersonDTO personDTO = new PersonDTO();
-             personDTO.setEmail(profile.get().getEmail());
-             personDTO.setPassword(profile.get().getPassword());
-             personDTO.setUsername(profile.get().getUsername());
-             personDTO.setCreated(profile.get().getCreated());
-             return new ResponseEntity<>(personDTO, HttpStatus.OK);
-         }
+        var profile = persons.findByChatId(chatId);
+        if (profile.isPresent()) {
+            PersonDTO personDTO = new PersonDTO();
+            personDTO.setEmail(profile.get().getEmail());
+            personDTO.setChatId(profile.get().getChatId());
+            personDTO.setPassword(profile.get().getPassword());
+            personDTO.setUsername(profile.get().getUsername());
+            personDTO.setCreated(profile.get().getCreated());
+            return new ResponseEntity<>(personDTO, HttpStatus.OK);
+        }
         return new ResponseEntity<>("Person not found", HttpStatus.NOT_FOUND);
     }
 

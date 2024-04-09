@@ -18,11 +18,11 @@ public class ForgetAction implements Action {
     public BotApiMethod<Message> handle(Message message) {
         var chatId = message.getChatId();
         var personUpdate = tgAuthCallWebClint.doPut("/person/updatePasswordTg", chatId).block();
-        if (personUpdate != null) {
-            String text = "Ваш пароль - " + tgConfig.getObjectToMap(personUpdate).get("password");
-            return new SendMessage(message.getChatId().toString(), text);
+        if (personUpdate == null) {
+            return new SendMessage(message.getChatId().toString(), "Не удалось восстановить пароль");
         }
-        return new SendMessage(message.getChatId().toString(), "Не удалось восстановить");
+        String text = "Ваш пароль - " + tgConfig.getObjectToMap(personUpdate).get("password");
+        return new SendMessage(message.getChatId().toString(), text);
     }
 
     @Override
