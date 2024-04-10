@@ -19,9 +19,11 @@ import ru.checkdev.auth.service.RoleService;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,18 +73,44 @@ public class PersonControllerTest {
                 .andDo(print());
     }
 
-/**
- @Test
- @WithMockUser public void testForgotPasswordByChatIdReturnOk() throws Exception {
- Map<String, String> response = new HashMap<>();
- response.put("password", person.getChatId().toString());
- when(personService.updatePassword(person.getChatId())).thenReturn(Optional.of(response));
- mockMvc.perform(MockMvcRequestBuilders.put("/person/updatePasswordTg")
- .content(new ObjectMapper().writeValueAsString(person.getChatId()))
- .contentType(MediaType.APPLICATION_JSON)
- .content(String.valueOf(person.getChatId())))
- .andExpect(status().isOk());
- verify(personService).updatePassword(person.getChatId());
- }
- */
+    /**
+    @Test
+    @WithMockUser
+    public void testForgotPasswordByChatIdReturnOk() throws Exception {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("chatId", person.getChatId().toString());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("password", person.getChatId().toString());
+
+        when(personService.updatePassword(person.getChatId())).thenReturn(Optional.of(response));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/person/updatePasswordTg")
+                        .content(new ObjectMapper().writeValueAsString(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(personService).updatePassword(person.getChatId());
+    }
+
+    @Test
+    @WithMockUser
+    public void testUpdatePasswordBadRequest() throws Exception {
+        Long chatId = null;
+        mockMvc.perform(put("/person/updatePasswordTg")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.valueOf(chatId)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdatePasswordNoContent() throws Exception {
+        Long chatId = 54321L;
+        given(personService.updatePassword(chatId)).willReturn(Optional.empty());
+        mockMvc.perform(put("/person/updatePasswordTg")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.valueOf(chatId)))
+                .andExpect(status().isNoContent());
+    }
+         */
 }
