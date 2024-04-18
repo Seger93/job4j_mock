@@ -34,6 +34,8 @@ public class SecurityConfig {
                 "/person/resume/**",
                 "/order/save",
                 "/person/by/email",
+                "/person/telegram/{chatId}",
+                "/person/updatePasswordTg",
                 "/img",
                 "/person/profile",
                 "/template/queue",

@@ -14,7 +14,9 @@ import java.util.Collections;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Testing TgAuthCallWebClint
@@ -55,7 +57,7 @@ class TgAuthCallWebClintTest {
                 .set(Calendar.MONTH, Calendar.OCTOBER)
                 .set(Calendar.YEAR, 2023)
                 .build();
-        var personDto = new PersonDTO("mail", "password", true, Collections.EMPTY_LIST, created);
+        var personDto = new PersonDTO("mail", "www", "password", true, Collections.EMPTY_LIST, created, 1L);
         when(webClientMock.get()).thenReturn(requestHeadersUriMock);
         when(requestHeadersUriMock.uri("/person/" + personId)).thenReturn(requestHeadersMock);
         when(requestHeadersMock.retrieve()).thenReturn(responseMock);
@@ -83,7 +85,7 @@ class TgAuthCallWebClintTest {
                 .set(Calendar.MONTH, Calendar.OCTOBER)
                 .set(Calendar.YEAR, 2023)
                 .build();
-        var personDto = new PersonDTO("mail", "password", true, null, created);
+        var personDto = new PersonDTO("mail", "www", "password", true, null, created, 1L);
         when(webClientMock.post()).thenReturn(requestBodyUriMock);
         when(requestBodyUriMock.uri("/person/created")).thenReturn(requestBodyMock);
         when(requestBodyMock.bodyValue(personDto)).thenReturn(requestHeadersMock);
@@ -91,6 +93,56 @@ class TgAuthCallWebClintTest {
         when(responseMock.bodyToMono(Object.class)).thenReturn(Mono.just(personDto));
         Mono<Object> objectMono = tgAuthCallWebClint.doPost("/person/created", personDto);
         PersonDTO actual = (PersonDTO) objectMono.block();
+        assertThat(actual).isEqualTo(personDto);
+    }
+
+    @Test
+    void whenGetPersonByChatID() {
+        Long chatID = 1L;
+        var created = new Calendar.Builder()
+                .set(Calendar.DAY_OF_MONTH, 23)
+                .set(Calendar.MONTH, Calendar.OCTOBER)
+                .set(Calendar.YEAR, 2023)
+                .build();
+        var personDto = new PersonDTO("mail", "www", "password", true, Collections.EMPTY_LIST, created, 1L);
+        when(webClientMock.get()).thenReturn(requestHeadersUriMock);
+        when(requestHeadersUriMock.uri("/person/telegram/" + chatID)).thenReturn(requestHeadersMock);
+        when(requestHeadersMock.retrieve()).thenReturn(responseMock);
+        when(responseMock.bodyToMono(PersonDTO.class)).thenReturn(Mono.just(personDto));
+        PersonDTO actual = tgAuthCallWebClint.doGet("/person/telegram/" + chatID).block();
+        assertThat(actual).isEqualTo(personDto);
+    }
+
+    @Test
+    void whenGetPersonByChatIdThenReturnExceptionError() {
+        Long chatID = 2L;
+        when(webClientMock.get()).thenReturn(requestHeadersUriMock);
+        when(requestHeadersUriMock.uri("/person/telegram/" + chatID)).thenReturn(requestHeadersMock);
+        when(requestHeadersMock.retrieve()).thenReturn(responseMock);
+        when(responseMock.bodyToMono(PersonDTO.class)).thenReturn(Mono.error(new Throwable("Error")));
+        assertThatThrownBy(() -> tgAuthCallWebClint.doGet("/person/telegram/" + chatID).block())
+                .isInstanceOf(Throwable.class)
+                .hasMessageContaining("Error");
+    }
+
+    @Test
+    void whenPutUpdatePasswordPersonReturnNewPassword() {
+        var created = new Calendar.Builder()
+                .set(Calendar.DAY_OF_MONTH, 23)
+                .set(Calendar.MONTH, Calendar.OCTOBER)
+                .set(Calendar.YEAR, 2023)
+                .build();
+        var personDto = new PersonDTO("mail", "www", "password", true, null, created, 1L);
+
+        when(webClientMock.put()).thenReturn(requestBodyUriMock);
+        when(requestBodyUriMock.uri("/person/updatePasswordTg")).thenReturn(requestBodyMock);
+        when(requestBodyMock.bodyValue(personDto.getChatId())).thenReturn(requestHeadersMock);
+        when(requestHeadersMock.retrieve()).thenReturn(responseMock);
+        given(responseMock.bodyToMono((Class<Object>) any())).willReturn(Mono.just(personDto));
+
+        Mono<Object> personMono = tgAuthCallWebClint.doPut("/person/updatePasswordTg", personDto.getChatId());
+        PersonDTO actual = (PersonDTO) personMono.block();
+
         assertThat(actual).isEqualTo(personDto);
     }
 }

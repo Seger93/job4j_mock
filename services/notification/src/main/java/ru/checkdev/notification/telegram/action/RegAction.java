@@ -52,6 +52,7 @@ public class RegAction implements Action {
         var email = message.getText();
         var text = "";
         var sl = System.lineSeparator();
+        var userName = message.getFrom().getUserName();
 
         if (!tgConfig.isEmail(email)) {
             text = "Email: " + email + " не корректный." + sl
@@ -61,8 +62,8 @@ public class RegAction implements Action {
         }
 
         var password = tgConfig.getPassword();
-        var person = new PersonDTO(email, password, true, null,
-                Calendar.getInstance());
+        var person = new PersonDTO(email, userName, password, true, null,
+                Calendar.getInstance(), message.getChatId());
         Object result;
         try {
             result = authCallWebClint.doPost(URL_AUTH_REGISTRATION, person).block();
