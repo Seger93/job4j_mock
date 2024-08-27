@@ -4,14 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithSecurityContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.dto.PersonDTO;
 import ru.checkdev.auth.service.PersonService;
 import ru.checkdev.auth.service.RoleService;
@@ -19,9 +25,11 @@ import ru.checkdev.auth.service.RoleService;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,12 +42,19 @@ public class PersonControllerTest {
 
     @MockBean
     PersonService personService;
+
     @MockBean
     private RoleService roles;
     @Autowired
     private MockMvc mockMvc;
 
+    @InjectMocks
     private PersonController personController;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private PasswordEncoder encoding;
 
     Calendar created = new Calendar.Builder()
             .setDate(2023, 10, 23)
@@ -47,10 +62,6 @@ public class PersonControllerTest {
             .build();
     private final PersonDTO person = new PersonDTO("email@mail.ru", "www", "password", true, created, 1L);
 
-    @Before
-    public void initController() {
-        this.personController = new PersonController(personService, roles);
-    }
 
     @Test
     @WithMockUser
@@ -73,12 +84,21 @@ public class PersonControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @WithMockUser
+    public void whenGetPersonByChatIdNotFoundThenReturnStatusTwoHundred() throws Exception {
+        when(personService.findByChatId(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/person/telegram/{chatId}", 12345L))
+                .andExpect(status().isNotFound());
+    }
+
     /**
     @Test
     @WithMockUser
     public void testForgotPasswordByChatIdReturnOk() throws Exception {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("chatId", person.getChatId().toString());
+        Map<String, Long> requestBody = new HashMap<>();
+        requestBody.put("chatId", person.getChatId());
 
         Map<String, String> response = new HashMap<>();
         response.put("password", person.getChatId().toString());
@@ -112,5 +132,5 @@ public class PersonControllerTest {
                         .content(String.valueOf(chatId)))
                 .andExpect(status().isNoContent());
     }
-         */
+    */
 }

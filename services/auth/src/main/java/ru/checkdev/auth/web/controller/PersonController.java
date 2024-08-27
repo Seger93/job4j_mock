@@ -165,7 +165,8 @@ public class PersonController {
     }
 
     @PutMapping("/updatePasswordTg")
-    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Long chatId) {
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, Long> requestBody) {
+        Long chatId = requestBody.get("chatId");
         return persons.updatePassword(chatId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
