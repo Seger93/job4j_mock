@@ -82,7 +82,7 @@ public class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id").value(-1)); // Проверьте нужные поля
+                .andExpect(jsonPath("$[0].id").value(-1));
 
         verify(orderService, times(1)).findByType("fresh");
     }
